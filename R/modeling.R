@@ -65,12 +65,16 @@ computeCommunProb <- function(object, type = c("triMean", "truncatedMean","thres
                               nboot = 100, seed.use = 1L, Kh = 0.5, n = 1) {
   type <- match.arg(type)
   cat(type, "is used for calculating the average gene expression per cell group.", "\n")
+# FunMean <- switch(type,
+  #                  triMean = triMean,
+  #                  truncatedMean = function(x) mean(x, trim = trim, na.rm = TRUE),
+  #                  thresholdedMean = function(x) thresholdedMean(x, trim = trim, na.rm = TRUE),
+  #                  median = function(x) median(x, na.rm = TRUE))
   FunMean <- switch(type,
-                    triMean = triMean,
-                    truncatedMean = function(x) mean(x, trim = trim, na.rm = TRUE),
+                    triMean = function(x, na.rm = TRUE)  mean(stats::quantile(x, probs = c(0.25, 0.50, 0.50, 0.75), na.rm = na.rm)),
+                     truncatedMean = function(x) mean(x, trim = trim, na.rm = TRUE),
                     thresholdedMean = function(x) thresholdedMean(x, trim = trim, na.rm = TRUE),
                     median = function(x) median(x, na.rm = TRUE))
-
   if (raw.use) {
     data <- as.matrix(object@data.signaling)
   } else {
